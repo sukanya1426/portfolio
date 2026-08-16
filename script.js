@@ -69,4 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', updateActiveNav, { passive: true });
     updateActiveNav();
+
+    let fileStamp = null;
+    const watchFiles = async () => {
+        try {
+            const response = await fetch('/__mtime?' + Date.now(), { cache: 'no-store' });
+            if (!response.ok) return;
+            const stamp = await response.text();
+            if (fileStamp === null) {
+                fileStamp = stamp;
+            } else if (stamp !== fileStamp) {
+                location.reload();
+            }
+        } catch (_) {
+            /* preview server may not be running */
+        }
+    };
+    setInterval(watchFiles, 800);
 });
